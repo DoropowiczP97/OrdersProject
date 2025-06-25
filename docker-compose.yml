@@ -1,0 +1,64 @@
+version: "3.8"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: orders_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: OrdersDb
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: app123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - ordersnet
+
+  ordersapi:
+    build:
+      context: .
+      dockerfile: OrdersProject.API/Dockerfile
+    container_name: orders_api
+    ports:
+      - "5001:80"
+    depends_on:
+      - mysql
+    environment:
+    - ASPNETCORE_ENVIRONMENT=Development
+    - ASPNETCORE_URLS=http://+:80
+    networks:
+      - ordersnet
+
+  ordersproject.webui:
+    build:
+      context: .
+      dockerfile: OrdersProject.WebUI/Dockerfile
+    container_name: orders_web
+    ports:
+      - "5002:80"
+    depends_on:
+      - ordersapi
+      - mysql
+    networks:
+      - ordersnet
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: orders_phpmyadmin
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: root
+    depends_on:
+      - mysql
+    networks:
+      - ordersnet
+
+volumes:
+  mysql_data:
+
+networks:
+  ordersnet:
