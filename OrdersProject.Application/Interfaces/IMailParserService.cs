@@ -3,6 +3,6 @@
 namespace OrdersProject.Application.Interfaces;
 public interface IMailParserService
 {
-    Task<List<ParsedOrderItem>> ParseEmailAsync(string emailHtml);
+    Task<ParsedOrderDto> ParseEmailAsync(string emailHtml);
 
 }

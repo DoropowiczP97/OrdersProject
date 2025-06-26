@@ -1,6 +1,6 @@
 ﻿namespace OrdersProject.Application.DTOs.Orders;
 
-public class ParsedOrderItem
+public class ParsedOrderItemDto
 {
     public string ProductName { get; set; } = default!;
     public int Quantity { get; set; }

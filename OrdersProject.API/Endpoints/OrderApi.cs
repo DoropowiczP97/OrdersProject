@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using OrdersProject.Application.Features.Orders.Commands;
 using OrdersProject.Application.Features.Orders.Queries;
 using OrdersProject.Application.Features.Orders.Queries.GetPageable;
+using OrdersProject.Domain.Interfaces;
 
 namespace OrdersProject.API.Endpoints;
 
@@ -20,6 +21,11 @@ public static class OrdersApi
         {
             var id = await mediator.Send(command);
             return Results.Created($"/api/orders/{id}", id);
+        });
+        group.MapPost("/send-test-email", async ([FromServices] IEmailSenderService emailSender) =>
+        {
+            await emailSender.SendTestOrderEmailAsync();
+            return Results.Ok();
         });
 
         #endregion

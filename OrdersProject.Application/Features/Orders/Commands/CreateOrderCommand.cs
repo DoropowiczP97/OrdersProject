@@ -12,7 +12,6 @@ public class CreateOrderCommand : IRequest<Guid>
     public decimal ShippingCost { get; set; }
     public decimal TotalAmount { get; set; }
     public string ShippingAddress { get; set; } = string.Empty;
-    public byte[]? RawEmail { get; set; }
     public bool IsFromEmail { get; set; }
     public List<OrderItemDto> Items { get; set; } = new();
 }

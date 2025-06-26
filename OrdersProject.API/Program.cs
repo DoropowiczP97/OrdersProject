@@ -18,7 +18,7 @@ builder.Services.AddDbContext<OrderDbContext>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
         new MySqlServerVersion(new Version(8, 0, 36))
-    ));
+));
 
 // CQRS + Validators
 builder.Services.AddMediatR(cfg =>
@@ -35,33 +35,40 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
-// IMAP
-builder.Services.Configure<ImapSettings>(options =>
+// IMAP + SMTP
+builder.Services.Configure<EmailSettings>(options =>
 {
-    builder.Configuration.GetSection("ImapSettings").Bind(options);
-
-    options.Username = Environment.GetEnvironmentVariable("IMAP_USERNAME") ?? "";
-    options.Password = Environment.GetEnvironmentVariable("IMAP_PASSWORD") ?? "";
+    builder.Configuration.GetSection("EmailSettings").Bind(options);
+    options.Username = Environment.GetEnvironmentVariable("EMAIL_USERNAME") ?? "";
+    options.Password = Environment.GetEnvironmentVariable("EMAIL_PASSWORD") ?? "";
 });
 
 builder.Services.AddScoped<ImapService>();
+builder.Services.AddScoped<IEmailSenderService, EmailSenderService>();
 
-// OpenAi
+// OpenAI
 builder.Services.Configure<OpenAiSettings>(options =>
 {
+    builder.Configuration.GetSection("OpenAiSettings").Bind(options);
     options.ApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY") ?? "";
+
 });
 
 builder.Services.AddHttpClient<IMailParserService, OpenAiMailParserService>();
 
+// Migration
+using (var scope = builder.Services.BuildServiceProvider().CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<OrderDbContext>();
+    db.Database.Migrate();
+}
+
+// Mail parser
+builder.Services.AddHostedService<InboundEmailProcessingService>();
+
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var imap = scope.ServiceProvider.GetRequiredService<ImapService>();
-    await imap.FetchUnreadEmailsAsync(CancellationToken.None);
-}
 
 // Auto migracja
 using (var scope = app.Services.CreateScope())

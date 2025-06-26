@@ -12,10 +12,10 @@ namespace OrdersProject.Infrastructure.Services;
 
 public class ImapService
 {
-    private readonly ImapSettings _settings;
+    private readonly EmailSettings _settings;
     private readonly IInboundEmailRepository _inboundEmailRepository;
 
-    public ImapService(IOptions<ImapSettings> settings, IInboundEmailRepository inboundEmailRepository)
+    public ImapService(IOptions<EmailSettings> settings, IInboundEmailRepository inboundEmailRepository)
     {
         _settings = settings.Value;
         _inboundEmailRepository = inboundEmailRepository;
@@ -25,9 +25,10 @@ public class ImapService
     {
         using var client = new ImapClient();
 
-        await client.ConnectAsync(_settings.Host, _settings.Port, _settings.UseSsl, cancellationToken);
+        await client.ConnectAsync(_settings.ImapHost, _settings.ImapPort, _settings.ImapUseSsl, cancellationToken);
 
         client.AuthenticationMechanisms.Clear();
+
         client.AuthenticationMechanisms.Add("PLAIN");
 
         await client.AuthenticateAsync(_settings.Username, _settings.Password, cancellationToken);
