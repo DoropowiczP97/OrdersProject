@@ -6,6 +6,7 @@ using OrdersProject.Application.Common;
 using OrdersProject.Domain.Interfaces;
 using OrdersProject.Infrastructure.Persistence;
 using OrdersProject.Infrastructure.Persistence.Repositories;
+using OrdersProject.Infrastructure.Services;
 
 DotNetEnv.Env.Load();
 
@@ -42,7 +43,15 @@ builder.Services.Configure<ImapSettings>(options =>
     options.Password = Environment.GetEnvironmentVariable("IMAP_PASSWORD") ?? "";
 });
 
+builder.Services.AddScoped<ImapService>();
+
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var imap = scope.ServiceProvider.GetRequiredService<ImapService>();
+    await imap.FetchUnreadEmailsAsync(CancellationToken.None);
+}
 
 // Auto migracja
 using (var scope = app.Services.CreateScope())
