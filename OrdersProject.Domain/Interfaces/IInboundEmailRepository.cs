@@ -8,5 +8,6 @@ public interface IInboundEmailRepository
     Task<List<InboundEmail>> GetUnparsedAsync();
     Task UpdateAsync(InboundEmail email);
     Task MarkAsParsedAsync(Guid id);
+    Task<bool> ExistsByExternalIdAsync(int externalId);
 
 }

@@ -9,4 +9,5 @@ public class InboundEmail
     public Guid? OrderId { get; set; }
     public Order? Order { get; set; }
     public bool ParsedSuccessfully { get; set; } = false;
+    public int? ExternalId { get; set; }
 }

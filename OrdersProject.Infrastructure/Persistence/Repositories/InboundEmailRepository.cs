@@ -45,4 +45,9 @@ public class InboundEmailRepository : IInboundEmailRepository
         entity.ParsedSuccessfully = true;
         await _context.SaveChangesAsync();
     }
+    public async Task<bool> ExistsByExternalIdAsync(int externalId)
+    {
+        return await _context.InboundEmails
+            .AnyAsync(e => e.ExternalId == externalId);
+    }
 }

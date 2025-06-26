@@ -6,6 +6,7 @@ using OrdersProject.Application.Common;
 using OrdersProject.Domain.Entities;
 using OrdersProject.Domain.Interfaces;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace OrdersProject.Infrastructure.Services;
 
@@ -40,14 +41,28 @@ public class ImapService
         {
             var message = await inbox.GetMessageAsync(uid, cancellationToken);
 
+            int? externalId = null;
+
+            var match = Regex.Match(message.Subject, @"Nowe zamówienie (\d+)");
+
+            if (match.Success && int.TryParse(match.Groups[1].Value, out var parsedId))
+            {
+                externalId = parsedId;
+            }
+
+            if (externalId.HasValue && await _inboundEmailRepository.ExistsByExternalIdAsync(externalId.Value))
+                continue;
+
             var email = new InboundEmail
             {
                 Id = Guid.NewGuid(),
                 From = message.From.Mailboxes.FirstOrDefault()?.Address ?? "",
                 Subject = message.Subject ?? "",
                 ReceivedAt = message.Date.DateTime,
-                RawContent = Encoding.UTF8.GetBytes(message.ToString())
+                RawContent = Encoding.UTF8.GetBytes(message.ToString()),
+                ExternalId = externalId
             };
+
 
             await _inboundEmailRepository.AddAsync(email);
         }
