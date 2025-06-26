@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using OrdersProject.API.Endpoints;
 using OrdersProject.Application;
 using OrdersProject.Application.Common;
+using OrdersProject.Application.Interfaces;
 using OrdersProject.Domain.Interfaces;
 using OrdersProject.Infrastructure.Persistence;
 using OrdersProject.Infrastructure.Persistence.Repositories;
@@ -44,6 +45,15 @@ builder.Services.Configure<ImapSettings>(options =>
 });
 
 builder.Services.AddScoped<ImapService>();
+
+// OpenAi
+builder.Services.Configure<OpenAiSettings>(options =>
+{
+    options.ApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY") ?? "";
+});
+
+builder.Services.AddHttpClient<IMailParserService, OpenAiMailParserService>();
+
 
 var app = builder.Build();
 
