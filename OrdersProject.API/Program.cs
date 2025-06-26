@@ -83,7 +83,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// Https only if not dev
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 // app.UseAuthorization();
 
 app.MapOrders();

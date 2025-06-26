@@ -49,3 +49,7 @@ h1:focus {
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
 }
+.rz-notification-message.rz-growl {
+    top: 20px !important;
+    right: 20px !important;
+}

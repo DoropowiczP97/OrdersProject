@@ -1,0 +1,139 @@
+﻿@page "/"
+@rendermode InteractiveServer
+
+@using System
+@using System.Collections.Generic
+@using System.Net.Http.Json
+@using Radzen
+@using Radzen.Blazor
+@using OrdersProject.Application.DTOs.Orders
+@using OrdersProject.Application.Common
+@inject NotificationService NotificationService
+@inject HttpClient Http
+
+<PageTitle>Zamówienia</PageTitle>
+
+<h1>Zamówienia</h1>
+
+<RadzenCard Style="padding:20px; max-width:100%; margin:auto">
+
+    <RadzenButton Text="Wyślij testowy e-mail"
+                  Icon="email"
+                  Style="margin-bottom: 10px"
+                  Click="@SendTestEmail"
+                  Disabled="@isSending" />
+
+    <RadzenDataGrid @ref="grid"
+                    Data="@orders"
+                    TItem="OrderDto"
+                    Count="@count"
+                    LoadData="@LoadData"
+                    AllowPaging="true"
+                    PageSize="10"
+                    AllowSorting="true"
+                    AllowFiltering="false"
+                    ExpandMode="DataGridExpandMode.Multiple"
+                    Responsive="true"
+                    Style="width:100%">
+        <Columns>
+            <RadzenDataGridColumn TItem="OrderDto" Property="Id" Title="ID" />
+            <RadzenDataGridColumn TItem="OrderDto" Property="CustomerName" Title="Klient" />
+            <RadzenDataGridColumn TItem="OrderDto" Property="SourceEmail" Title="Email" />
+            <RadzenDataGridColumn TItem="OrderDto" Property="OrderDate" Title="Data" FormatString="{0:dd.MM.yyyy}" />
+            <RadzenDataGridColumn TItem="OrderDto" Property="PaymentMethod" Title="Płatność" />
+            <RadzenDataGridColumn TItem="OrderDto" Property="ShippingCost" Title="Wysyłka" FormatString="{0:N2} zł" />
+            <RadzenDataGridColumn TItem="OrderDto" Property="TotalAmount" Title="Całość" FormatString="{0:N2} zł" />
+        </Columns>
+        <Template Context="order">
+            <RadzenDataGrid Data="order.Items"
+                            TItem="OrderItemDto"
+                            AllowPaging="false"
+                            ShowPagingSummary="false"
+                            ShowHeaderSummary="false"
+                            Responsive="true"
+                            Style="margin: 10px; width:100%;">
+                <Columns>
+                    <RadzenDataGridColumn TItem="OrderItemDto" Property="ProductName" Title="Produkt" />
+                    <RadzenDataGridColumn TItem="OrderItemDto" Property="Quantity" Title="Ilość" />
+                    <RadzenDataGridColumn TItem="OrderItemDto" Property="Price" Title="Cena" FormatString="{0:N2} zł" />
+                </Columns>
+            </RadzenDataGrid>
+        </Template>
+    </RadzenDataGrid>
+</RadzenCard>
+@code {
+    private RadzenDataGrid<OrderDto> grid;
+    private IEnumerable<OrderDto> orders = Array.Empty<OrderDto>();
+    private int count;
+    private bool isSending = false;
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await grid.Reload();
+        }
+    }
+
+    private async Task LoadData(LoadDataArgs args)
+    {
+        try
+        {
+            var page = (args.Skip ?? 0) / (args.Top ?? 10) + 1;
+            var pageSize = args.Top ?? 10;
+
+            var result = await Http.GetFromJsonAsync<PagedResult<OrderDto>>(
+                $"api/orders?pageNumber={page}&pageSize={pageSize}");
+
+            orders = result?.Items ?? new List<OrderDto>();
+            count = result?.TotalCount ?? 0;
+        }
+        catch (Exception ex)
+        {
+            orders = new List<OrderDto>();
+            count = 0;
+        }
+    }
+
+    private async Task SendTestEmail()
+    {
+        if (isSending)
+            return;
+
+        isSending = true;
+        try
+        {
+            var response = await Http.PostAsync("api/orders/send-test-email", null);
+
+            if (response.IsSuccessStatusCode)
+            {
+                NotificationService.Notify(
+                    NotificationSeverity.Success,
+                    "Sukces",
+                    "Testowy e-mail został wysłany.");
+            }
+            else
+            {
+                NotificationService.Notify(
+                    NotificationSeverity.Error,
+                    "Błąd",
+                    $"Serwer zwrócił {(int)response.StatusCode}.");
+            }
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(
+                NotificationSeverity.Error,
+                "Wyjątek",
+                ex.Message);
+        }
+        finally
+        {
+            await Task.Delay(3000);
+            isSending = false;
+            StateHasChanged();
+        }
+    }
+
+}
