@@ -7,4 +7,6 @@ public interface IInboundEmailRepository
     Task AddAsync(InboundEmail email);
     Task<List<InboundEmail>> GetUnparsedAsync();
     Task UpdateAsync(InboundEmail email);
+    Task MarkAsParsedAsync(Guid id);
+
 }

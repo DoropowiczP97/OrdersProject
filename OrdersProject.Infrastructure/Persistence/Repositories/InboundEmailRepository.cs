@@ -37,4 +37,12 @@ public class InboundEmailRepository : IInboundEmailRepository
         _context.InboundEmails.Update(email);
         await _context.SaveChangesAsync();
     }
+    public async Task MarkAsParsedAsync(Guid id)
+    {
+        var entity = await _context.InboundEmails.FindAsync(id);
+        if (entity is null) return;
+
+        entity.ParsedSuccessfully = true;
+        await _context.SaveChangesAsync();
+    }
 }
