@@ -23,6 +23,7 @@ builder.Services.AddValidatorsFromAssembly(typeof(AssemblyReference).Assembly);
 
 // DI
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IInboundEmailRepository, InboundEmailRepository>();
 
 // Minimal API + Swagger
 builder.Services.AddEndpointsApiExplorer();

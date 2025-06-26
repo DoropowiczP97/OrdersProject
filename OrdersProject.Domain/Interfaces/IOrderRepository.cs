@@ -6,4 +6,5 @@ public interface IOrderRepository
     Task AddAsync(Order order);
     Task<List<Order>> GetPagedAsync(int pageNumber, int pageSize);
     Task<int> CountAsync();
+    Task<Order?> GetByIdAsync(Guid id);
 }

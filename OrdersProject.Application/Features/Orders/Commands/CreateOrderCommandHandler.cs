@@ -25,7 +25,6 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Gui
             ShippingCost = request.ShippingCost,
             TotalAmount = request.TotalAmount,
             ShippingAddress = request.ShippingAddress,
-            RawEmail = request.RawEmail,
             Items = request.Items.Select(i => new OrderItem
             {
                 ProductName = i.ProductName,

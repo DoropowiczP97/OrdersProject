@@ -19,6 +19,13 @@ public class OrderRepository : IOrderRepository
         await _context.Orders.AddAsync(order);
         await _context.SaveChangesAsync();
     }
+    public async Task<Order?> GetByIdAsync(Guid id)
+    {
+        return await _context.Orders
+            .Include(o => o.Items)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(o => o.Id == id);
+    }
 
     public async Task<List<Order>> GetPagedAsync(int pageNumber, int pageSize)
     {

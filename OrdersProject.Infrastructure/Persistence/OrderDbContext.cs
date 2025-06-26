@@ -5,9 +5,9 @@ using System.Reflection;
 namespace OrdersProject.Infrastructure.Persistence;
 public class OrderDbContext(DbContextOptions<OrderDbContext> options) : DbContext(options)
 {
-    public DbSet<Order> Orders => Set<Order>();
-    public DbSet<OrderItem> OrderItems => Set<OrderItem>();
-
+    public DbSet<Order> Orders { get; set; }
+    public DbSet<OrderItem> OrderItems { get; set; }
+    public DbSet<InboundEmail> InboundEmails { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

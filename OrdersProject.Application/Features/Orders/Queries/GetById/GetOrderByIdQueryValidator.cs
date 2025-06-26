@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FluentValidation;
 
-namespace OrdersProject.Application.Features.Orders.Queries.GetById
+namespace OrdersProject.Application.Features.Orders.Queries.GetById;
+
+public class GetOrderByIdValidator : AbstractValidator<GetOrderByIdQuery>
 {
-    internal class GetOrderByIdQueryValidator
+    public GetOrderByIdValidator()
     {
+        RuleFor(x => x.Id)
+            .NotEmpty().WithMessage("ID jest wymagane.");
     }
 }

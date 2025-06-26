@@ -35,9 +35,6 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.Property(x => x.TotalAmount)
                .HasColumnType("decimal(18,2)");
 
-        builder.Property(x => x.RawEmail)
-               .HasColumnType("LONGBLOB");
-
         builder.HasMany(o => o.Items)
                .WithOne(i => i.Order)
                .HasForeignKey(i => i.OrderId);

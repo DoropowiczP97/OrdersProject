@@ -9,6 +9,5 @@ public class Order
     public decimal ShippingCost { get; set; }
     public decimal TotalAmount { get; set; }
     public string ShippingAddress { get; set; } = string.Empty;
-    public byte[]? RawEmail { get; set; }
     public List<OrderItem> Items { get; set; } = new();
 }
