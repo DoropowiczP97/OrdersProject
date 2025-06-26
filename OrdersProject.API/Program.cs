@@ -2,9 +2,12 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using OrdersProject.API.Endpoints;
 using OrdersProject.Application;
+using OrdersProject.Application.Common;
 using OrdersProject.Domain.Interfaces;
 using OrdersProject.Infrastructure.Persistence;
 using OrdersProject.Infrastructure.Persistence.Repositories;
+
+DotNetEnv.Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,7 +18,7 @@ builder.Services.AddDbContext<OrderDbContext>(options =>
         new MySqlServerVersion(new Version(8, 0, 36))
     ));
 
-// CQRS i Validatory
+// CQRS + Validators
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(AssemblyReference).Assembly));
 
@@ -28,6 +31,16 @@ builder.Services.AddScoped<IInboundEmailRepository, InboundEmailRepository>();
 // Minimal API + Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+
+// IMAP
+builder.Services.Configure<ImapSettings>(options =>
+{
+    builder.Configuration.GetSection("ImapSettings").Bind(options);
+
+    options.Username = Environment.GetEnvironmentVariable("IMAP_USERNAME") ?? "";
+    options.Password = Environment.GetEnvironmentVariable("IMAP_PASSWORD") ?? "";
+});
 
 var app = builder.Build();
 
