@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using OrdersProject.Domain.Entities;
 
+namespace OrdersProject.Infrastructure.Persistence.Configurations;
 public class InboundEmailConfiguration : IEntityTypeConfiguration<InboundEmail>
 {
     public void Configure(EntityTypeBuilder<InboundEmail> builder)

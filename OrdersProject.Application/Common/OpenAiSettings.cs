@@ -2,8 +2,8 @@
 
 public class OpenAiSettings
 {
-    public string ApiKey { get; set; } = string.Empty;
-    public string Endpoint { get; set; } = string.Empty;
-    public string Model { get; set; } = string.Empty;
+    public string ApiKey { get; set; }
+    public string Endpoint { get; set; }
+    public string Model { get; set; }
     public float Temperature { get; set; } = 0.7f;
 }

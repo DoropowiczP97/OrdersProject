@@ -47,7 +47,6 @@ public class InboundEmailProcessingService : BackgroundService
     private async Task ProcessEmailsAsync(IServiceProvider provider, CancellationToken ct)
     {
         var emailRepo = provider.GetRequiredService<IInboundEmailRepository>();
-        var orderRepo = provider.GetRequiredService<IOrderRepository>();
         var parser = provider.GetRequiredService<IMailParserService>();
         var mediator = provider.GetRequiredService<IMediator>();
         var imapService = provider.GetRequiredService<ImapService>();

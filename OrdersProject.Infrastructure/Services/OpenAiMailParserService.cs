@@ -64,7 +64,7 @@ public class OpenAiMailParserService : IMailParserService
         if (response.StatusCode == HttpStatusCode.TooManyRequests)
         {
             var body = await response.Content.ReadAsStringAsync();
-            throw new Exception($"Rate limit hit (OpenAI): {body}");
+            throw new HttpRequestException($"Limit zapytań przekroczony (OpenAI): {body}", inner: null, statusCode: response.StatusCode);
         }
 
         response.EnsureSuccessStatusCode();
@@ -79,7 +79,7 @@ public class OpenAiMailParserService : IMailParserService
             .GetString();
 
         if (string.IsNullOrWhiteSpace(content))
-            throw new Exception("Odpowiedź modelu była pusta.");
+            throw new HttpRequestException("Odpowiedź modelu była pusta.",inner: null,statusCode: HttpStatusCode.NoContent);
 
         var parsed = JsonSerializer.Deserialize<ParsedOrderDto>(content!, new JsonSerializerOptions
         {
@@ -87,7 +87,7 @@ public class OpenAiMailParserService : IMailParserService
         });
 
         if (parsed == null)
-            throw new Exception("Nie udało się sparsować odpowiedzi modelu.");
+            throw new HttpRequestException("Nie udało się sparsować odpowiedzi modelu.",inner: null,statusCode: HttpStatusCode.UnprocessableEntity);
 
         return parsed;
     }
