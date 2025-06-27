@@ -27,19 +27,34 @@ public class OrderRepository : IOrderRepository
             .FirstOrDefaultAsync(o => o.Id == id);
     }
 
-    public async Task<List<Order>> GetPagedAsync(int pageNumber, int pageSize)
+    public async Task<List<Order>> GetPagedAsync(int pageNumber, int pageSize, string? sortBy = null, string? sortDirection = "asc")
     {
         if (pageNumber < 1) pageNumber = 1;
         if (pageSize < 1) pageSize = 10;
 
-        return await _context.Orders
+        IQueryable<Order> query = _context.Orders
             .AsNoTracking()
-            .Include(o => o.Items)
-            .OrderByDescending(o => o.OrderDate)
+            .Include(o => o.Items);
+
+        if (!string.IsNullOrEmpty(sortBy))
+        {
+            var isDescending = sortDirection?.ToLower() == "desc";
+
+            query = isDescending
+                ? query.OrderByDescending(o => EF.Property<object>(o, sortBy))
+                : query.OrderBy(o => EF.Property<object>(o, sortBy));
+        }
+        else
+        {
+            query = query.OrderByDescending(o => o.OrderDate);
+        }
+
+        return await query
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
     }
+
 
     public async Task<int> CountAsync()
     {

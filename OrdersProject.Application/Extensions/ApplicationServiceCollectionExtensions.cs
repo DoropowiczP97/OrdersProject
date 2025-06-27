@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace OrdersProject.Application.DependencyInjection;
+namespace OrdersProject.Application.Extensions;
 
 
 public static class ApplicationServiceCollectionExtensions

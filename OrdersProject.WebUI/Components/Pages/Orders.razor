@@ -83,16 +83,28 @@
             var page = (args.Skip ?? 0) / (args.Top ?? 10) + 1;
             var pageSize = args.Top ?? 10;
 
-            var result = await Http.GetFromJsonAsync<PagedResult<OrderDto>>(
-                $"api/orders?pageNumber={page}&pageSize={pageSize}");
+            var sortDescriptor = args.Sorts?.FirstOrDefault();
+            string? sortBy = sortDescriptor?.Property;
+            string sortDirection = sortDescriptor?.SortOrder == SortOrder.Descending ? "desc" : "asc";
+
+            var query = $"api/orders?pageNumber={page}&pageSize={pageSize}";
+            if (!string.IsNullOrWhiteSpace(sortBy))
+            {
+                query += $"&sortBy={sortBy}&sortDirection={sortDirection}";
+            }
+
+            var result = await Http.GetFromJsonAsync<PagedResult<OrderDto>>(query);
 
             orders = result?.Items ?? new List<OrderDto>();
             count = result?.TotalCount ?? 0;
+
+            StateHasChanged();
         }
         catch (Exception ex)
         {
             orders = new List<OrderDto>();
             count = 0;
+            NotificationService.Notify(NotificationSeverity.Error, "Błąd", $"Nie udało się załadować danych: {ex.Message}");
         }
     }
 
@@ -102,6 +114,7 @@
             return;
 
         isSending = true;
+
         try
         {
             var response = await Http.PostAsync("api/orders/send-test-email", null);

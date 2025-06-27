@@ -23,26 +23,34 @@ public class OpenAiMailParserService : IMailParserService
     public async Task<ParsedOrderDto> ParseEmailAsync(string emailHtml)
     {
         var prompt = $$"""
-            Zamień poniższy HTML maila WooCommerce na JSON zamówienia w formacie:
+        Zamień poniższy HTML maila WooCommerce na JSON zamówienia w formacie:
+        {
+          "CustomerName": string,
+          "SourceEmail": string,
+          "OrderDate": "yyyy-MM-dd",
+          "PaymentMethod": string,
+          "ShippingCost": decimal,
+          "TotalAmount": decimal,
+          "ShippingAddress": string,
+          "Items": [
             {
-              "CustomerName": string,
-              "SourceEmail": string,
-              "OrderDate": "yyyy-MM-dd",
-              "PaymentMethod": string,
-              "ShippingCost": decimal,
-              "TotalAmount": decimal,
-              "ShippingAddress": string,
-              "Items": [
-                {
-                  "ProductName": string,
-                  "Quantity": int,
-                  "Price": decimal
-                }
-              ]
+              "ProductName": string,
+              "Quantity": int,
+              "Price": decimal
             }
+          ]
+        }
 
-            Zwróć tylko JSON. Email HTML:
-            {{emailHtml}}
+        Zwróć tylko poprawny JSON.
+
+        Ważne:
+        - Używaj **polskich znaków diakrytycznych** (np. ą, ć, ę, ł, ń, ó, ś, ź, ż).
+        - Zakoduj wszystkie teksty poprawnie w **UTF-8**.
+        - Nie używaj znaków zastępczych (Ã, Å itp.).
+        - Jeśli tekst zawiera `Płatność`, `Adres`, itp. — zachowaj je dokładnie z polskimi znakami.
+
+        Email HTML:
+        {{emailHtml}}
         """;
 
         var requestBody = new

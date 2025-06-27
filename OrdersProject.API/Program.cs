@@ -1,6 +1,5 @@
 using OrdersProject.API.Endpoints;
-using OrdersProject.Application.DependencyInjection;
-using OrdersProject.Infrastructure.DependencyInjection;
+using OrdersProject.Application.Extensions;
 using OrdersProject.Infrastructure.Extensions;
 
 DotNetEnv.Env.Load();

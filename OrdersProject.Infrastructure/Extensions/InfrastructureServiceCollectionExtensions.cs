@@ -8,7 +8,7 @@ using OrdersProject.Infrastructure.Persistence;
 using OrdersProject.Infrastructure.Persistence.Repositories;
 using OrdersProject.Infrastructure.Services;
 
-namespace OrdersProject.Infrastructure.DependencyInjection;
+namespace OrdersProject.Infrastructure.Extensions;
 
 public static class InfrastructureServiceCollectionExtensions
 {

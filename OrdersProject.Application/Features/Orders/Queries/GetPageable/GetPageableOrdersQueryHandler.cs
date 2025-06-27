@@ -1,9 +1,8 @@
 ﻿using MediatR;
 using OrdersProject.Application.Common;
 using OrdersProject.Application.DTOs.Orders;
+using OrdersProject.Application.Features.Orders.Queries.GetPageable;
 using OrdersProject.Domain.Interfaces;
-
-namespace OrdersProject.Application.Features.Orders.Queries.GetPageable;
 
 public class GetPageableOrdersQueryHandler : IRequestHandler<GetPageableOrdersQuery, PagedResult<OrderDto>>
 {
@@ -18,7 +17,12 @@ public class GetPageableOrdersQueryHandler : IRequestHandler<GetPageableOrdersQu
     {
         var totalCount = await _orderRepository.CountAsync();
 
-        var orders = await _orderRepository.GetPagedAsync(request.PageNumber, request.PageSize);
+        var orders = await _orderRepository.GetPagedAsync(
+            request.PageNumber,
+            request.PageSize,
+            request.SortBy,
+            request.SortDirection
+        );
 
         var dtoList = orders.Select(o => new OrderDto
         {
